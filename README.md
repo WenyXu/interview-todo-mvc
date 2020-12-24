@@ -1,11 +1,11 @@
 # TODO MVC (Interview)
 
-The is general interview question
+A general coding task 
 
 ## Requirements
 
-1. MUST BE public to GitHub (public repository)
-2. MUST BE use react architecture
-3. MUST BE can see the gradual process (commit history)
-4. implement a TODO MVC SPA project
-5. UI You not can reproduce <https://todomvc.com>
+1. MUST publish to GitHub (public repository)
+2. MUST use React
+3. the commit history MUST be clear to the reviewers
+4. Feature reference: <https://todomvc.com>
+5. The UI MUST NOT be the same with the web site given above.
