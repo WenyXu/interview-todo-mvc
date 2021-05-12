@@ -9,3 +9,7 @@ A general coding task
 3. the commit history MUST be clear to the reviewers
 4. Feature reference: <http://todomvc.com>
 5. The UI MUST NOT be the same with the web site given above.
+
+## Optionals
+
+1. Do not use `create-react-app` or other code generator
