@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input, ListGroup, Container } from 'reactstrap';
+import { v4 as uuidv4 } from 'uuid';
 import Todo from './Todo';
 
 function TodoList({filter, setCount}) {
@@ -11,7 +12,10 @@ function TodoList({filter, setCount}) {
         setTodos(list);
     }
 
-    const addTodo = val => setTodos([...todos, {val, isCompleted: false}])
+    const addTodo = val => {
+        const id = uuidv4();
+        setTodos([...todos, {val, isCompleted: false, id}])
+    }
 
     const filteredTodos = () => {
         if (filter === 3) return todos.filter(todo => todo.isCompleted);
@@ -54,7 +58,15 @@ function TodoList({filter, setCount}) {
             {   
                 !!todos.length && (
                     <ListGroup>
-                        {filteredTodos().map((todo, i) => <Todo text={todo.val} key={i} />)}
+                        {filteredTodos().map(todo => {
+                            return <Todo text={todo.val} 
+                                         key={todo.id} 
+                                         id={todo.id} 
+                                         todos={todos} 
+                                         setTodos={setTodos}
+                                         isComplete={todo.isCompleted}
+                                    />
+                        })}
                     </ListGroup>
 
                 )
