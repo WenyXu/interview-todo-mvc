@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, ListGroup } from 'reactstrap';
+import { Input, ListGroup, Container } from 'reactstrap';
 import Todo from './Todo';
 
 function TodoList() {
@@ -7,14 +7,11 @@ function TodoList() {
     const [task, setTask] = useState('');
 
     const getTodos = () => {
-        const list = localStorage.getItem('todos').json();
-        setTodos(list);
+        const list = localStorage.getItem('todos');
+        setTodos(JSON.parse(list));
     }
 
-    const addTodo = val => {
-        setTodos([...todos, e.target.value]);
-        localStorage.setItem('todos', JSON.stringify(todos));
-    }
+    const addTodo = val => setTodos([...todos, val]);
 
     const handleChange = e => setTask(e.target.value);
 
@@ -29,26 +26,29 @@ function TodoList() {
         getTodos();
     }, [])
 
+    useEffect(() => {
+        localStorage.setItem('todos', JSON.stringify(todos));
+    }, [todos])
+
     return(
-        <div>
-            <Input placeholder="Write down a task!" 
+        <Container>
+            <Input placeholder="Write down a task..." 
                 value={task} 
                 onChange={handleChange}
                 onKeyDown={handleSubmit}
-
+                bsSize="lg"
             />
+            <br/>
             {   
-                todos.length && (
+                !!todos.length && (
                     <ListGroup>
-                        {todos.map((todo, i) => {
-                            <Todo text={todo} key={i} />
-                        })}
+                        {todos.map((todo, i) => <Todo text={todo} key={i} />)}
                     </ListGroup>
 
                 )
             }
 
-        </div>
+        </Container>
 
     )
 }
