@@ -2,16 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { Input, ListGroup, Container } from 'reactstrap';
 import Todo from './Todo';
 
-function TodoList() {
+function TodoList({filter, setCount}) {
     const [todos, setTodos] = useState([]);
     const [task, setTask] = useState('');
 
     const getTodos = () => {
-        const list = localStorage.getItem('todos');
-        setTodos(JSON.parse(list));
+        const list = JSON.parse(localStorage.getItem('todos'));
+        setTodos(list);
     }
 
-    const addTodo = val => setTodos([...todos, val]);
+    const addTodo = val => setTodos([...todos, {val, isCompleted: false}])
+
+    const filteredTodos = () => {
+        if (filter === 3) return todos.filter(todo => todo.isCompleted);
+        else if (filter === 2) return todos.filter(todo => !todo.isCompleted);
+        return todos;
+    }
+
+    const activeTodoCount = () => {
+        return todos.filter(todo => !todo.isCompleted).length;
+    }
 
     const handleChange = e => setTask(e.target.value);
 
@@ -28,7 +38,9 @@ function TodoList() {
 
     useEffect(() => {
         localStorage.setItem('todos', JSON.stringify(todos));
+        setCount(activeTodoCount());
     }, [todos])
+
 
     return(
         <Container>
@@ -42,7 +54,7 @@ function TodoList() {
             {   
                 !!todos.length && (
                     <ListGroup>
-                        {todos.map((todo, i) => <Todo text={todo} key={i} />)}
+                        {filteredTodos().map((todo, i) => <Todo text={todo.val} key={i} />)}
                     </ListGroup>
 
                 )

@@ -11,3 +11,13 @@ h3 {
     box-shadow: none;
     border-color: #ced4da;
 }
+
+.btn-group {
+    left: 85%;
+    top: 25%;
+}
+
+#task-count {
+    top: 25%;
+    position: relative;
+}
