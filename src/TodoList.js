@@ -44,9 +44,13 @@ function TodoList({filter, setCount}) {
             todo.isCompleted = !isSelected;
             return todo;
         });
-        console.log(newTodos);
         setTodos(newTodos);
 
+    }
+
+    const handleDeletion = () => {
+        const newTodos = todos.filter(todo => !todo.isCompleted);
+        setTodos(newTodos);
     }
 
     useEffect(() => {
@@ -88,8 +92,11 @@ function TodoList({filter, setCount}) {
                             })}
                         </ListGroup>
                         <br/>
-                        <Button outline color="danger" onClick={handleSelect}>
+                        <Button outline color="success" onClick={handleSelect}>
                             {!isSelected ? 'Complete All' : 'Uncomplete all'}
+                        </Button>
+                        <Button outline color="danger" onClick={handleDeletion}>
+                            Delete Selected
                         </Button>
                     </>
 

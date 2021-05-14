@@ -28,3 +28,7 @@ h3 {
     margin-right: 20px;
     cursor: pointer;
 }
+
+.btn-outline-danger, .btn-outline-success {
+    margin-right: 10px;
+}
