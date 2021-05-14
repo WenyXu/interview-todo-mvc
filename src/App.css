@@ -22,11 +22,16 @@ h3 {
     position: relative;
 }
 
-.circle {
+.circle, .remove {
     height: 20px;
     width: 20px;
     margin-right: 20px;
     cursor: pointer;
+}
+
+.remove {
+    margin-right: 0px;
+    float: right;
 }
 
 .btn-outline-danger, .btn-outline-success {

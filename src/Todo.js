@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ListGroupItem } from 'reactstrap';
 import circle from './assets/circle-regular.svg'
 import checkCircle from './assets/check-circle-regular.svg';
+import remove from './assets/remove.svg';
 
 function Todo({id, text, setTodos, todos, isComplete, setSelected}) {
     const [isCompleted, setComplete] = useState(false);
@@ -18,6 +19,11 @@ function Todo({id, text, setTodos, todos, isComplete, setSelected}) {
         
     }
 
+    const handleDeletion = () => {
+        const newTodos = todos.filter(todo => todo.id !== id);
+        setTodos(newTodos);
+    }
+
     useEffect(() => {
         setComplete(isComplete);
     }, [isComplete])
@@ -26,7 +32,7 @@ function Todo({id, text, setTodos, todos, isComplete, setSelected}) {
         <ListGroupItem>
             <img className="circle" 
                  src={isCompleted ? checkCircle : circle} 
-                 alt="" 
+                 alt="complete" 
                  onClick={handleClick}
                  />
             {
@@ -35,6 +41,11 @@ function Todo({id, text, setTodos, todos, isComplete, setSelected}) {
                 (<strike>{text}</strike>)
                 
             }
+            <img className="remove" 
+                 src={remove} 
+                 alt="delete" 
+                 onClick={handleDeletion}
+            />
         </ListGroupItem>
     )
 }
