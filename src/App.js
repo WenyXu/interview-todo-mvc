@@ -12,7 +12,7 @@ export default function App() {
                 <Row xs="3">
                     <Col>
                         <div id="task-count">
-                            {numTasks} tasks remaining
+                            {numTasks} {numTasks === 1 ? 'task' : 'tasks'} remaining
                         </div>
                     </Col>
                     <Col>

@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Input, ListGroup, Container, Button } from 'reactstrap';
 import { v4 as uuidv4 } from 'uuid';
 import Todo from './Todo';
 
 function TodoList({filter, setCount}) {
-    const [todos, setTodos] = useState([]);
+    let currList = localStorage.getItem('todos');
+    if (currList) currList = JSON.parse(currList);
+    else currList = [];
+    const inputEl = useRef();
+    const [todos, setTodos] = useState(currList);
     const [task, setTask] = useState('');
     const [isSelected, setSelected] = useState(false);
+    const [editing, setEditing] = useState({isEditing: false, id: null});
 
     const getTodos = () => {
         const list = JSON.parse(localStorage.getItem('todos'));
@@ -16,8 +21,10 @@ function TodoList({filter, setCount}) {
 
     const addTodo = val => {
         const id = uuidv4();
-        setTodos([...todos, {val, isCompleted: false, id}])
+        setTodos([...todos, {val, isCompleted: false, id, isEditing: false}])
     }
+
+    const updateTodo = () => setEditing({...editing, isEditing: false});
 
     const filteredTodos = () => {
         if (filter === 3) return todos.filter(todo => todo.isCompleted);
@@ -33,8 +40,11 @@ function TodoList({filter, setCount}) {
 
     const handleSubmit = e => {
         if (e.keyCode === 13) {
-            addTodo(task)
-            setTask('');
+            if (editing.isEditing) updateTodo()
+            else {
+                addTodo(task)
+                setTask('');
+            }
         }
     }
 
@@ -45,7 +55,6 @@ function TodoList({filter, setCount}) {
             return todo;
         });
         setTodos(newTodos);
-
     }
 
     const handleDeletion = () => {
@@ -58,6 +67,28 @@ function TodoList({filter, setCount}) {
         if (list.filter(todo => todo.isCompleted).length === list.length) setSelected(true);
         else setSelected(false);
     }, [])
+
+    useEffect(() => {
+        let txt = '';
+        console.log(inputEl.current);
+        const newTodos = todos.map(todo => {
+            if (todo.id === editing.id) {
+                if (editing.isEditing) {
+                    txt = todo.val;
+                    todo.isEditing = true;
+                } else {
+                    todo.val = task;
+                    todo.isEditing = false;
+                }
+            }
+            return todo;
+        });
+        setTodos(newTodos);
+        if (editing.isEditing) {
+            setTask(txt);
+            inputEl.current.focus();
+        } else setTask('');
+    }, [editing])
 
     useEffect(() => {
         localStorage.setItem('todos', JSON.stringify(todos));
@@ -74,6 +105,7 @@ function TodoList({filter, setCount}) {
                 onChange={handleChange}
                 onKeyDown={handleSubmit}
                 bsSize="lg"
+                innerRef={inputEl}
             />
             <br/>
             {   
@@ -87,7 +119,9 @@ function TodoList({filter, setCount}) {
                                             todos={todos} 
                                             setTodos={setTodos}
                                             isComplete={todo.isCompleted}
-                                            setSelected={setSelected}
+                                            setEditing={setEditing}
+                                            editing={editing}
+                                            isEditing={todo.isEditing}
                                         />
                             })}
                         </ListGroup>

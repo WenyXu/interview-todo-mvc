@@ -4,19 +4,23 @@ import circle from './assets/circle-regular.svg'
 import checkCircle from './assets/check-circle-regular.svg';
 import remove from './assets/remove.svg';
 
-function Todo({id, text, setTodos, todos, isComplete, setSelected}) {
+function Todo({id, text, setTodos, todos, isComplete, setEditing, editing, isEditing}) {
     const [isCompleted, setComplete] = useState(false);
 
     const handleClick = e => {
+        if (isEditing) return;
         setComplete(!isCompleted);
         const newTodos = todos.map(todo => {
             if (todo.id === id) return {...todo, isCompleted: !isCompleted};
             return todo
         })
-        if (newTodos.filter(todo => todo.isCompleted).length === todos.length) setSelected(true)
-        else setSelected(false);
         setTodos(newTodos);
-        
+    }
+
+    const handleDoubleClick = () => {
+        if (isComplete) return;
+        if (editing.isEditing) return;
+        setEditing({isEditing: true, id: id});
     }
 
     const handleDeletion = () => {
@@ -27,26 +31,27 @@ function Todo({id, text, setTodos, todos, isComplete, setSelected}) {
     useEffect(() => {
         setComplete(isComplete);
     }, [isComplete])
-    
+
     return(
-        <ListGroupItem>
+        <ListGroupItem style={{backgroundColor: isEditing ? 'lightgreen' : 'white'}}>  
             <img className="circle" 
-                 src={isCompleted ? checkCircle : circle} 
-                 alt="complete" 
-                 onClick={handleClick}
-                 />
+                src={isCompleted ? checkCircle : circle} 
+                alt="complete" 
+                onClick={handleClick}
+                />
             {
                 !isCompleted ? 
-                (<span>{text}</span>) :
+                (<span onDoubleClick={handleDoubleClick}>{text}</span>) :
                 (<strike>{text}</strike>)
                 
             }
             <img className="remove" 
-                 src={remove} 
-                 alt="delete" 
-                 onClick={handleDeletion}
+                src={remove} 
+                alt="delete" 
+                onClick={handleDeletion}
             />
         </ListGroupItem>
+        
     )
 }
 
