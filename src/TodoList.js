@@ -7,7 +7,7 @@ function TodoList({filter, setCount}) {
     const inputEl = useRef();
     const [todos, setTodos] = useState(JSON.parse(localStorage.getItem('todos')) || []);
     const [task, setTask] = useState('');
-    const [isAllSelected, setIsAllSelected] = useState(false);
+    const [areAllSelected, setAreAllSelected] = useState(false);
     const [editId, setEditId] = useState(null);
 
 
@@ -51,9 +51,9 @@ function TodoList({filter, setCount}) {
     }
 
     const handleSelect = () => {
-        setIsAllSelected(!isAllSelected);
+        setAreAllSelected(!areAllSelected);
         const newTodos = todos.map(todo => {
-            todo.isCompleted = !isAllSelected;
+            todo.isCompleted = !areAllSelected;
             return todo;
         });
         handleSetTodos(newTodos);
@@ -65,7 +65,7 @@ function TodoList({filter, setCount}) {
     }
 
     useEffect(() => {
-        setIsAllSelected(todos.filter(todo => todo.isCompleted).length === todos.length);
+        setAreAllSelected(todos.filter(todo => todo.isCompleted).length === todos.length);
     }, [])
 
     useEffect(() => {
@@ -78,7 +78,7 @@ function TodoList({filter, setCount}) {
 
     useEffect(() => {
         setCount(activeTodoCount());
-        setIsAllSelected(todos.filter(todo => todo.isCompleted).length === todos.length);
+        setAreAllSelected(todos.filter(todo => todo.isCompleted).length === todos.length);
     }, [todos])
 
 
@@ -110,7 +110,7 @@ function TodoList({filter, setCount}) {
                         </ListGroup>
                         <br/>
                         <Button outline color="success" onClick={handleSelect}>
-                            {!isAllSelected ? 'Complete All' : 'Uncomplete all'}
+                            {!areAllSelected ? 'Complete All' : 'Uncomplete all'}
                         </Button>
                         <Button outline color="danger" onClick={handleDeletion}>
                             Delete Selected
