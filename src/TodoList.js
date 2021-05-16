@@ -4,27 +4,33 @@ import { v4 as uuidv4 } from 'uuid';
 import Todo from './Todo';
 
 function TodoList({filter, setCount}) {
-    let currList = localStorage.getItem('todos');
-    if (currList) currList = JSON.parse(currList);
-    else currList = [];
     const inputEl = useRef();
-    const [todos, setTodos] = useState(currList);
+    const [todos, setTodos] = useState(JSON.parse(localStorage.getItem('todos')) || []);
     const [task, setTask] = useState('');
-    const [isSelected, setSelected] = useState(false);
-    const [editing, setEditing] = useState({isEditing: false, id: null});
+    const [isAllSelected, setIsAllSelected] = useState(false);
+    const [editId, setEditId] = useState(null);
 
-    const getTodos = () => {
-        const list = JSON.parse(localStorage.getItem('todos'));
-        setTodos(list);
-        return list;
-    }
 
-    const addTodo = val => {
+    const addTodo = text => {
         const id = uuidv4();
-        setTodos([...todos, {val, isCompleted: false, id, isEditing: false}])
+        const todo = {text, isCompleted: false, id};
+        const newTodos = [...todos, todo];
+        handleSetTodos(newTodos);
     }
 
-    const updateTodo = () => setEditing({...editing, isEditing: false});
+    const handleSetTodos = (todos) => {
+        localStorage.setItem('todos', JSON.stringify(todos));
+        setTodos(todos);
+    }
+
+    const updateTodo = () => {
+        const newTodos = todos.map(todo => {
+            if (todo.id === editId) todo.text = task;
+            return todo;
+        })
+        handleSetTodos(newTodos);
+        setEditId(null);
+    }
 
     const filteredTodos = () => {
         if (filter === 3) return todos.filter(todo => todo.isCompleted);
@@ -32,75 +38,54 @@ function TodoList({filter, setCount}) {
         return todos;
     }
 
-    const activeTodoCount = () => {
-        return todos.filter(todo => !todo.isCompleted).length;
-    }
+    const activeTodoCount = () => todos.filter(todo => !todo.isCompleted).length;
 
     const handleChange = e => setTask(e.target.value);
 
     const handleSubmit = e => {
         if (e.keyCode === 13) {
-            if (editing.isEditing) updateTodo()
-            else {
-                addTodo(task)
-                setTask('');
-            }
+            if (editId) updateTodo()
+            else addTodo(task)
+            setTask('');
         }
     }
 
     const handleSelect = () => {
-        setSelected(!isSelected);
+        setIsAllSelected(!isAllSelected);
         const newTodos = todos.map(todo => {
-            todo.isCompleted = !isSelected;
+            todo.isCompleted = !isAllSelected;
             return todo;
         });
-        setTodos(newTodos);
+        handleSetTodos(newTodos);
     }
 
     const handleDeletion = () => {
         const newTodos = todos.filter(todo => !todo.isCompleted);
-        setTodos(newTodos);
+        handleSetTodos(newTodos);
     }
 
     useEffect(() => {
-        const list = getTodos();
-        if (list.filter(todo => todo.isCompleted).length === list.length) setSelected(true);
-        else setSelected(false);
+        setIsAllSelected(todos.filter(todo => todo.isCompleted).length === todos.length);
     }, [])
 
     useEffect(() => {
-        let txt = '';
-        console.log(inputEl.current);
-        const newTodos = todos.map(todo => {
-            if (todo.id === editing.id) {
-                if (editing.isEditing) {
-                    txt = todo.val;
-                    todo.isEditing = true;
-                } else {
-                    todo.val = task;
-                    todo.isEditing = false;
-                }
-            }
-            return todo;
-        });
-        setTodos(newTodos);
-        if (editing.isEditing) {
-            setTask(txt);
+        if (editId) {
+            const text = todos.filter(todo => todo.id === editId)[0].text;
+            setTask(text);
             inputEl.current.focus();
-        } else setTask('');
-    }, [editing])
+        }
+    }, [editId])
 
     useEffect(() => {
-        localStorage.setItem('todos', JSON.stringify(todos));
         setCount(activeTodoCount());
-        if (todos.filter(todo => todo.isCompleted).length === todos.length) setSelected(true);
-        else setSelected(false);
+        setIsAllSelected(todos.filter(todo => todo.isCompleted).length === todos.length);
     }, [todos])
 
 
     return(
         <Container>
-            <Input placeholder="Write down a task..." 
+            <Input 
+                placeholder="Write down a task..." 
                 value={task} 
                 onChange={handleChange}
                 onKeyDown={handleSubmit}
@@ -113,21 +98,19 @@ function TodoList({filter, setCount}) {
                     <>
                         <ListGroup>
                             {filteredTodos().map(todo => {
-                                return <Todo text={todo.val} 
+                                return <Todo
+                                            {...todo}
                                             key={todo.id} 
-                                            id={todo.id} 
                                             todos={todos} 
-                                            setTodos={setTodos}
-                                            isComplete={todo.isCompleted}
-                                            setEditing={setEditing}
-                                            editing={editing}
-                                            isEditing={todo.isEditing}
+                                            handleSetTodos={handleSetTodos}
+                                            setEditId={setEditId}
+                                            editId={editId}
                                         />
                             })}
                         </ListGroup>
                         <br/>
                         <Button outline color="success" onClick={handleSelect}>
-                            {!isSelected ? 'Complete All' : 'Uncomplete all'}
+                            {!isAllSelected ? 'Complete All' : 'Uncomplete all'}
                         </Button>
                         <Button outline color="danger" onClick={handleDeletion}>
                             Delete Selected

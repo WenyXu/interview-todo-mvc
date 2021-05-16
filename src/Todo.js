@@ -4,28 +4,27 @@ import circle from './assets/circle-regular.svg'
 import checkCircle from './assets/check-circle-regular.svg';
 import remove from './assets/remove.svg';
 
-function Todo({id, text, setTodos, todos, isComplete, setEditing, editing, isEditing}) {
-    const [isCompleted, setComplete] = useState(false);
+function Todo({id, text, handleSetTodos, todos, isCompleted, editId, setEditId}) {
+    const [isComplete, setComplete] = useState(isCompleted);
 
     const handleClick = e => {
-        if (isEditing) return;
-        setComplete(!isCompleted);
+        if (editId) return;
+        setComplete(!isComplete);
         const newTodos = todos.map(todo => {
-            if (todo.id === id) return {...todo, isCompleted: !isCompleted};
-            return todo
-        })
-        setTodos(newTodos);
+            if (todo.id === id) todo.isCompleted = !isComplete
+            return todo;
+        });
+        handleSetTodos(newTodos);
     }
 
     const handleDoubleClick = () => {
-        if (isComplete) return;
-        if (editing.isEditing) return;
-        setEditing({isEditing: true, id: id});
+        if (isComplete || editId) return;
+        setEditId(id);
     }
 
     const handleDeletion = () => {
         const newTodos = todos.filter(todo => todo.id !== id);
-        setTodos(newTodos);
+        handleSetTodos(newTodos);
     }
 
     useEffect(() => {
@@ -33,8 +32,9 @@ function Todo({id, text, setTodos, todos, isComplete, setEditing, editing, isEdi
     }, [isComplete])
 
     return(
-        <ListGroupItem style={{backgroundColor: isEditing ? 'lightgreen' : 'white'}}>  
-            <img className="circle" 
+        <ListGroupItem style={{backgroundColor: editId === id ? 'lightgreen' : 'white'}}>  
+            <img 
+                className="circle" 
                 src={isCompleted ? checkCircle : circle} 
                 alt="complete" 
                 onClick={handleClick}
@@ -43,9 +43,9 @@ function Todo({id, text, setTodos, todos, isComplete, setEditing, editing, isEdi
                 !isCompleted ? 
                 (<span onDoubleClick={handleDoubleClick}>{text}</span>) :
                 (<strike>{text}</strike>)
-                
             }
-            <img className="remove" 
+            <img 
+                className="remove" 
                 src={remove} 
                 alt="delete" 
                 onClick={handleDeletion}
